@@ -1,0 +1,7 @@
+message InputMessage
+{
+  required bool ahead = 1;
+  required bool back  = 2;
+  required bool left  = 3;
+  required bool right = 4;
+}

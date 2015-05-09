@@ -1,0 +1,6 @@
+message ImageMessage
+{
+  required uint32 width  = 1;
+  required uint32 height = 2;
+  required bytes data    = 3;
+}
