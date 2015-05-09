@@ -23,6 +23,13 @@ int main(int argc, char** argv)
 
     if (!successL || !successR)
     {
+      InputMessage inputMsg;
+      inputMsg.set_ahead(false);
+      inputMsg.set_back(false);
+      inputMsg.set_left(false);
+      inputMsg.set_right(false);
+      node.publish("CarInput", inputMsg);
+
       // exit(0);
       continue;
     }
