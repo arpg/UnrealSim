@@ -16,6 +16,8 @@
 #include "Engine/SkeletalMesh.h"
 #include "Engine.h"
 
+#include <node/Node.h>
+
 #ifdef HMD_INTGERATION
 // Needed for VR Headset
 #include "IHeadMountedDisplay.h"
@@ -28,6 +30,16 @@ const FName AUnrealSimPawn::EngineAudioRPM("RPM");
 #define LOCTEXT_NAMESPACE "VehiclePawn"
 
 #define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
+
+
+// node RPC for resetting the Pawn
+bool g_bDoReset = false;
+void ClientNodeReset(void)
+{
+  UE_LOG(LogTemp, Log, TEXT("Reset Received"));
+  g_bDoReset = true;
+}
+
 
 AUnrealSimPawn::AUnrealSimPawn(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer),
@@ -250,6 +262,22 @@ void AUnrealSimPawn::EnableIncarView(const bool bState)
 
 void AUnrealSimPawn::Tick(float Delta)
 {
+  if( g_bDoReset ){
+    UE_LOG(LogTemp, Log, TEXT("OMG resetting"));
+    FVector l = RootComponent->RelativeLocation;
+    FRotator r = RootComponent->RelativeRotation;
+    r.Roll = 0;
+    r.Pitch = 0;
+
+    UE_LOG(LogTemp, Log, 
+        TEXT("Location %f, %f, %f"), l.X, l.Y, l.Z );
+    l.Z += 50;
+    RootComponent->SetWorldLocation(l);
+    RootComponent->SetWorldRotation(r);
+
+    g_bDoReset = false;
+  }
+
 	// Setup the flag to say we are in reverse gear
 	bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
 	
@@ -292,17 +320,22 @@ void AUnrealSimPawn::BeginPlay()
 	// Enable in car view if HMD is attached
 	bWantInCar = GEngine->HMDDevice.IsValid()
 #endif // HMD_INTGERATION
-	
+
 	EnableIncarView(bWantInCar);
 	// Start an engine sound playing
 	EngineSoundComponent->Play();
+
+
+  // register callback to allow remotely reseting vehicle
+  simStateControlNode.init("VehiclePawn");
+  simStateControlNode.provide_rpc("reset",ClientNodeReset);
+  UE_LOG(LogTemp, Log, TEXT("Reset Registered"));
 }
 
 void AUnrealSimPawn::OnResetVR()
 {
 #ifdef HMD_INTGERATION
-	if (GEngine->HMDDevice.IsValid())
-	{
+	if (GEngine->HMDDevice.IsValid()) {
 		GEngine->HMDDevice->ResetOrientationAndPosition();
 		InternalCamera->SetRelativeLocation(InternalCameraOrigin);
 		GetController()->SetControlRotation(FRotator());

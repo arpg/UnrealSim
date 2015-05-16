@@ -24,11 +24,10 @@ bool InputNode::Init()
 uint32 InputNode::Run()
 {
   InputMessage message;
-  
+ 
   // node.init(name);
   node.init("Node3");
-  
-  
+   
   while (running)
   {
     // node.subscribe(topic);
@@ -37,13 +36,11 @@ uint32 InputNode::Run()
     // bool success = node.receive(topic, message);
     bool success = node.receive("node_demo/CarInput", message);
     
-    if (success)
-    {
+    if (success) {
       UE_LOG(LogTemp, Log, TEXT("Input Received"));
       AlertMessage(message);
     }
-
-    FPlatformProcess::Sleep(0.1f);
+    FPlatformProcess::Sleep(0.001f);
   }
   
   return 0;

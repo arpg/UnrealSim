@@ -36,6 +36,8 @@ void ACameraNode::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
   ElapsedTime += DeltaTime;
 
+//  UE_LOG(LogTemp, Log, TEXT("dtime %f"), DeltaTime);
+
   if (ElapsedTime > 0.05f)
   {
     PublishImage();

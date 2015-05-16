@@ -44,5 +44,4 @@ protected:
   std::string NodeNameString;
   std::string NodeTopicString;
   float ElapsedTime;
-  
 };

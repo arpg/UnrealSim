@@ -127,7 +127,9 @@ private:
 	/** Non Slippery Material instance */
 	UPhysicalMaterial* NonSlipperyMaterial;
     
-    InputNode* inputNode;
+  InputNode* inputNode;
+
+  node::node  simStateControlNode;
 
 
 public:
